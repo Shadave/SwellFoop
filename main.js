@@ -57,7 +57,7 @@
   };
 
   click = function() {
-    var deletable, ic, k, l, len, len1, tile, toAdd;
+    var deletable, ic, k, l, len, len1, len2, m, results, tile, toAdd;
     deletable = [];
     for (k = 0, len = tiles.length; k < len; k++) {
       tile = tiles[k];
@@ -80,8 +80,18 @@
       } else {
         toAdd = 0;
       }
-      return updateScore(toAdd);
+      updateScore(toAdd);
     }
+    results = [];
+    for (m = 0, len2 = tiles.length; m < len2; m++) {
+      tile = tiles[m];
+      if (tile !== null) {
+        results.push(tile.getSurrElems());
+      } else {
+        results.push(void 0);
+      }
+    }
+    return results;
   };
 
   checkMouse = function() {
@@ -89,38 +99,8 @@
       return ++mousestate;
     };
     return document.body.onmouseup = function() {
-      var k, len, tile;
       if (mousestate > 0) {
         click();
-        isNotEnd = false;
-        for (k = 0, len = tiles.length; k < len; k++) {
-          tile = tiles[k];
-          if (tile !== null) {
-            tile.getSurrElems();
-            if (isNotEnd === false) {
-              if (tile.topElem !== void 0) {
-                if (tiles[tile.topElem].origColor === tile.origColor) {
-                  isNotEnd = true;
-                }
-              }
-              if (tile.rightElem !== void 0) {
-                if (tiles[tile.rightElem].origColor === tile.origColor) {
-                  isNotEnd = true;
-                }
-              }
-              if (tile.bottomElem !== void 0) {
-                if (tiles[tile.bottomElem].origColor === tile.origColor) {
-                  isNotEnd = true;
-                }
-              }
-              if (tile.leftElem !== void 0) {
-                if (tiles[tile.leftElem].origColor === tile.origColor) {
-                  isNotEnd = true;
-                }
-              }
-            }
-          }
-        }
         return mousestate = 0;
       } else {
         return mousestate = 0;
@@ -306,7 +286,7 @@
   })();
 
   update = function() {
-    var k, len, tile;
+    var k, l, len, len1, tile;
     wnd.clear();
     checkMouse();
     checkLeft = true;
@@ -317,13 +297,43 @@
         tile.updateComp();
       }
     }
+    isNotEnd = false;
+    for (l = 0, len1 = tiles.length; l < len1; l++) {
+      tile = tiles[l];
+      if (tile !== null) {
+        if (isNotEnd === false) {
+          if (tile.topElem !== void 0) {
+            if (tiles[tile.topElem].origColor === tile.origColor) {
+              isNotEnd = true;
+            }
+          }
+          if (tile.rightElem !== void 0) {
+            if (tiles[tile.rightElem].origColor === tile.origColor) {
+              isNotEnd = true;
+            }
+          }
+          if (tile.bottomElem !== void 0) {
+            if (tiles[tile.bottomElem].origColor === tile.origColor) {
+              isNotEnd = true;
+            }
+          }
+          if (tile.leftElem !== void 0) {
+            if (tiles[tile.leftElem].origColor === tile.origColor) {
+              isNotEnd = true;
+            }
+          }
+        }
+      }
+    }
     if (isNotEnd === false) {
       wnd.stop();
       return;
     }
   };
 
-  voidAction = function() {};
+  voidAction = function() {
+    console.log("over");
+  };
 
   wnd = {
     screen: document.createElement("canvas"),
@@ -332,6 +342,7 @@
       this.screen.height = 800;
       this.context = this.screen.getContext("2d");
       document.body.insertBefore(this.screen, document.body.childNodes[2]);
+      updateScore(0);
       this.interval = setInterval(update, 20);
     },
     clear: function() {
@@ -339,9 +350,9 @@
     },
     stop: function() {
       var span;
-      this.interval = setInterval(voidAction, 10000);
+      clearInterval(this.interval);
       span = document.createElement("span");
-      span.innerHTML = "Game Over<br/>Score: " + score;
+      span.innerHTML = "<strong>Game Over</strong><br/>Score: " + score;
       return document.body.insertBefore(span, document.body.childNodes[2]);
     }
   };

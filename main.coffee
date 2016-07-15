@@ -56,6 +56,9 @@ click = () ->
 		else
 			toAdd = 0
 		updateScore(toAdd)
+	for tile in tiles
+		if (tile != null)
+			tile.getSurrElems()
 
 # Checking for Clicks
 checkMouse = () ->
@@ -64,23 +67,6 @@ checkMouse = () ->
 	document.body.onmouseup = () ->
 		if mousestate > 0
 			click()
-			isNotEnd = false
-			for tile in tiles
-				if (tile != null)
-					tile.getSurrElems()
-					if (isNotEnd == false)
-						if (tile.topElem != undefined)
-							if (tiles[tile.topElem].origColor == tile.origColor)
-								isNotEnd = true
-						if (tile.rightElem != undefined)
-							if (tiles[tile.rightElem].origColor == tile.origColor)
-								isNotEnd = true
-						if (tile.bottomElem != undefined)
-							if (tiles[tile.bottomElem].origColor == tile.origColor)
-								isNotEnd = true
-						if (tile.leftElem != undefined)
-							if (tiles[tile.leftElem].origColor == tile.origColor)
-								isNotEnd = true
 			mousestate = 0
 		else
 			mousestate = 0
@@ -209,12 +195,29 @@ update = () ->
 		if (tile != null)
 			tile.checkState()
 			tile.updateComp()
+	isNotEnd = false
+	for tile in tiles
+		if (tile != null)
+			if (isNotEnd == false)
+				if (tile.topElem != undefined)
+					if (tiles[tile.topElem].origColor == tile.origColor)
+						isNotEnd = true
+				if (tile.rightElem != undefined)
+					if (tiles[tile.rightElem].origColor == tile.origColor)
+						isNotEnd = true
+				if (tile.bottomElem != undefined)
+					if (tiles[tile.bottomElem].origColor == tile.origColor)
+						isNotEnd = true
+				if (tile.leftElem != undefined)
+					if (tiles[tile.leftElem].origColor == tile.origColor)
+						isNotEnd = true
 	if (isNotEnd == false)
 		wnd.stop()
 		return
 	return
 
 voidAction = () ->
+	console.log("over")
 	return
 
 # Window Object
@@ -225,15 +228,16 @@ wnd =
 		@screen.height = 800
 		@context = @screen.getContext("2d")
 		document.body.insertBefore(@screen, document.body.childNodes[2])
+		updateScore(0)
 		@interval = setInterval(update, 20)
 		return
 	clear: () ->
 		@context.clearRect(0,0, @screen.width, @screen.height)
 		return
 	stop: () ->
-		@interval = setInterval(voidAction, 10000)
+		clearInterval(@interval)
 		span = document.createElement("span")
-		span.innerHTML = "Game Over<br/>Score: #{score}"
+		span.innerHTML = "<strong>Game Over</strong><br/>Score: #{score}"
 		document.body.insertBefore(span, document.body.childNodes[2])
 
 startGame()
